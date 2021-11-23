@@ -1,4 +1,5 @@
 import { persons } from './personModel.js';
+import { validateIncomingBody } from './validate.js';
 
 export const controller = {
   getPersons: async (req, res) => {
@@ -11,6 +12,7 @@ export const controller = {
       res.end('Internal server error');
     }
   },
+
   getPerson: async (req, res, id) => {
     try {
       const data = await persons.getById(id);
@@ -26,6 +28,7 @@ export const controller = {
       res.end('Internal server error');
     }
   },
+
   addPerson: async (req, res) => {
     try {
       let body = '';
@@ -35,16 +38,23 @@ export const controller = {
 
       req.on('end', async () => {
         const item = JSON.parse(body);
-        // To-Do Validate body
-        const newPerson = await persons.create(item);
-        res.writeHead(201, 'Content-Type: application/json');
-        res.end(JSON.stringify(newPerson));
+
+        const valid = validateIncomingBody(item);
+        if (valid !== 'Valid') {
+          res.writeHead(400, 'Content-Type: plain/text');
+          res.end(valid);
+        } else {
+          const newPerson = await persons.create(item);
+          res.writeHead(201, 'Content-Type: application/json');
+          res.end(JSON.stringify(newPerson));
+        }
       });
     } catch (err) {
       res.writeHead(500);
       res.end('Internal server error');
     }
   },
+
   updatePerson: async (req, res, id) => {
     try {
       const data = await persons.getById(id);
@@ -70,6 +80,7 @@ export const controller = {
       res.end('Internal server error');
     }
   },
+
   deletePerson: async (req, res, id) => {
     try {
       const data = await persons.getById(id);
@@ -86,10 +97,12 @@ export const controller = {
       res.end('Internal server error');
     }
   },
+
   wrongMethod: (res) => {
     res.writeHead(405, 'Content-Type: plain/text');
     res.end('Method Not Allowed');
   },
+
   wrongUrl: (res) => {
     res.writeHead(404, 'Content-Type: plain/text');
     res.end("The URL passed doesn't exist");
