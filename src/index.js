@@ -7,7 +7,7 @@ dotenv.config();
 const PORT = process.env.PORT;
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/person') {
+  if (req.url === '/person' || req.url === '/person/') {
     switch (req.method) {
       case 'GET':
         controller.getPersons(req, res);
@@ -19,7 +19,7 @@ const server = http.createServer((req, res) => {
         controller.wrongMethod(res);
         break;
     }
-  } else if (req.url.match(/\/person\//)) {
+  } else if (req.url.match(/^\/person\/[a-z0-9\-]+[a-z0-9]$/)) {
     const id = req.url.replace('/person/', '');
     switch (req.method) {
       case 'GET':
