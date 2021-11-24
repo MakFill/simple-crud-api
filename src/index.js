@@ -19,7 +19,7 @@ const server = http.createServer((req, res) => {
         controller.wrongMethod(res);
         break;
     }
-  } else if (req.url.match(/^\/person\/[a-z0-9\-]+[a-z0-9]$/)) {
+  } else if (req.url.match(/^\/person\//)) {
     const id = req.url.replace('/person/', '');
     switch (req.method) {
       case 'GET':
