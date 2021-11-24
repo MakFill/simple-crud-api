@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime.js';
 import http from 'http';
 import dotenv from 'dotenv';
 import { controller } from './personController.js';
