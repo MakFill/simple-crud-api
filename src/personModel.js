@@ -4,7 +4,11 @@ import { v4 } from 'uuid';
 export const persons = {
   getAll: async () => {
     return new Promise((res, rej) => {
-      res(data);
+      try {
+        res(data);
+      } catch (err) {
+        rej(err);
+      }
     });
   },
 

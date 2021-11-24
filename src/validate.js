@@ -36,8 +36,12 @@ export function validateIncomingBody(body) {
   } else if (errors.wrongType.length > 0) {
     return `Invalid types for properties: ${errors.wrongType}`;
   } else if (Object.keys(body).length < 3) {
-    return 'You don\t pass all requred properties';
+    return "You don't pass all requred properties";
   } else {
     return 'Valid';
   }
+}
+
+export function validateUUID(id) {
+  return /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(id);
 }

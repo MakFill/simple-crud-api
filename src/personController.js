@@ -1,5 +1,5 @@
 import { persons } from './personModel.js';
-import { validateIncomingBody } from './validate.js';
+import { validateIncomingBody, validateUUID } from './validate.js';
 
 export const controller = {
   getPersons: async (req, res) => {
@@ -8,12 +8,17 @@ export const controller = {
       res.writeHead(200, 'Content-Type: application/json');
       res.end(JSON.stringify(data));
     } catch (err) {
+      process.stderr.write('Internal error: ' + err);
       res.writeHead(500);
       res.end('Internal server error');
     }
   },
 
   getPerson: async (req, res, id) => {
+    if (!validateUUID(id)) {
+      res.writeHead(400);
+      res.end(`id ${id} not uuid`);
+    }
     try {
       const data = await persons.getById(id);
       if (!data) {
@@ -24,6 +29,7 @@ export const controller = {
         res.end(JSON.stringify(data));
       }
     } catch (err) {
+      process.stderr.write('Internal error: ' + err);
       res.writeHead(500);
       res.end('Internal server error');
     }
@@ -37,25 +43,36 @@ export const controller = {
       });
 
       req.on('end', async () => {
-        const item = JSON.parse(body);
+        try {
+          const item = JSON.parse(body);
 
-        const valid = validateIncomingBody(item);
-        if (valid !== 'Valid') {
-          res.writeHead(400, 'Content-Type: plain/text');
-          res.end(valid);
-        } else {
-          const newPerson = await persons.create(item);
-          res.writeHead(201, 'Content-Type: application/json');
-          res.end(JSON.stringify(newPerson));
+          const valid = validateIncomingBody(item);
+          if (valid !== 'Valid') {
+            res.writeHead(400, 'Content-Type: plain/text');
+            res.end(valid);
+          } else {
+            const newPerson = await persons.create(item);
+            res.writeHead(201, 'Content-Type: application/json');
+            res.end(JSON.stringify(newPerson));
+          }
+        } catch (err) {
+          process.stderr.write('Internal error: ' + err);
+          res.writeHead(500);
+          res.end('Internal server error');
         }
       });
     } catch (err) {
+      process.stderr.write('Internal error: ' + err);
       res.writeHead(500);
       res.end('Internal server error');
     }
   },
 
   updatePerson: async (req, res, id) => {
+    if (!validateUUID(id)) {
+      res.writeHead(400);
+      res.end(`id ${id} not uuid`);
+    }
     try {
       const data = await persons.getById(id);
       if (!data) {
@@ -68,31 +85,49 @@ export const controller = {
         });
 
         req.on('end', async () => {
-          const item = JSON.parse(body);
-          // To-Do Validate body
-          const newPerson = await persons.update(id, item);
-          res.writeHead(201, 'Content-Type: application/json');
-          res.end(JSON.stringify(newPerson));
+          try {
+            const item = JSON.parse(body);
+
+            const valid = validateIncomingBody(item);
+            if (valid !== 'Valid') {
+              res.writeHead(400, 'Content-Type: plain/text');
+              res.end(valid);
+            } else {
+              const newPerson = await persons.update(id, item);
+              res.writeHead(200, 'Content-Type: application/json');
+              res.end(JSON.stringify(newPerson));
+            }
+          } catch (err) {
+            process.stderr.write('Internal error: ' + err);
+            res.writeHead(500);
+            res.end('Internal server error');
+          }
         });
       }
     } catch (err) {
+      process.stderr.write('Internal error: ' + err);
       res.writeHead(500);
       res.end('Internal server error');
     }
   },
 
   deletePerson: async (req, res, id) => {
+    if (!validateUUID(id)) {
+      res.writeHead(400);
+      res.end(`id ${id} not uuid`);
+    }
     try {
       const data = await persons.getById(id);
       if (!data) {
         res.writeHead(404);
         res.end(`Person with id ${id} not found`);
       } else {
-        const deletedPerson = await persons.delete(id);
-        res.writeHead(201, 'Content-Type: application/json');
-        res.end(JSON.stringify(deletedPerson));
+        await persons.delete(id);
+        res.writeHead(204, 'Content-Type: application/json');
+        res.end();
       }
     } catch (err) {
+      process.stderr.write('Internal error: ' + err);
       res.writeHead(500);
       res.end('Internal server error');
     }
