@@ -5,7 +5,7 @@ const controller = require('./personController.js');
 const PORT = process.env.PORT;
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/person' || req.url === '/person/') {
+  if (req.url === '/person') {
     switch (req.method) {
       case 'GET':
         controller.getPersons(req, res);

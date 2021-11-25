@@ -36,7 +36,7 @@ function validateIncomingBody(body) {
   } else if (errors.wrongType.length > 0) {
     return `Invalid types for properties: ${errors.wrongType}`;
   } else if (Object.keys(body).length < 3) {
-    return "You don't pass all requred properties";
+    return "You don't pass all required properties";
   } else {
     return 'Valid';
   }
