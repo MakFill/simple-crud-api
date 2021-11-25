@@ -1,7 +1,7 @@
-import { persons } from './personModel.js';
-import { validateIncomingBody, validateUUID } from './validate.js';
+const persons = require('./personModel.js');
+const { validateIncomingBody, validateUUID } = require('./validate.js');
 
-export const controller = {
+const controller = {
   getPersons: async (req, res) => {
     try {
       const data = await persons.getAll();
@@ -143,3 +143,5 @@ export const controller = {
     res.end("The URL passed doesn't exist");
   },
 };
+
+module.exports = controller;

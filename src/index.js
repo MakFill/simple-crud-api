@@ -1,9 +1,6 @@
-import 'regenerator-runtime/runtime.js';
-import http from 'http';
-import dotenv from 'dotenv';
-import { controller } from './personController.js';
-
-dotenv.config();
+require('dotenv').config();
+const http = require('http');
+const controller = require('./personController.js');
 
 const PORT = process.env.PORT;
 

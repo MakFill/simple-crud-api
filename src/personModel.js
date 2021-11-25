@@ -1,7 +1,7 @@
-import data from './data.json';
-import { v4 } from 'uuid';
+const data = require('./data.json');
+const { v4 } = require('uuid');
 
-export const persons = {
+const persons = {
   getAll: async () => {
     return new Promise((res, rej) => {
       try {
@@ -60,3 +60,5 @@ export const persons = {
     });
   },
 };
+
+module.exports = persons;

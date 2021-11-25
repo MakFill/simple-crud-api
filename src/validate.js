@@ -1,4 +1,4 @@
-export function validateIncomingBody(body) {
+function validateIncomingBody(body) {
   const errors = { wrongProps: [], wrongType: [] };
 
   for (let prop in body) {
@@ -42,6 +42,8 @@ export function validateIncomingBody(body) {
   }
 }
 
-export function validateUUID(id) {
+function validateUUID(id) {
   return /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(id);
 }
+
+module.exports = { validateIncomingBody, validateUUID };
