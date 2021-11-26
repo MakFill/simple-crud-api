@@ -1,4 +1,5 @@
-const axios = require('axios');
+require('dotenv').config();
+const request = require('supertest')(`http://localhost:${process.env.PORT}/`);
 
 describe('Check REST API', () => {
   const mockPerson = {
@@ -8,50 +9,45 @@ describe('Check REST API', () => {
   };
 
   test('GET by /person', async () => {
-    const res = await axios('http://localhost:4000/person');
+    const res = await request.get('person');
     expect(res.status).toBe(200);
-    expect(res.data).toStrictEqual([]);
+    expect(JSON.parse(res.text)).toEqual([]);
   });
 
   test('POST by /person', async () => {
-    const res = await axios('http://localhost:4000/person', {
-      method: 'POST',
-      data: mockPerson,
-    });
-    mockPerson.id = res.data.id;
+    const res = await request.post('person').send(mockPerson);
+    const body = JSON.parse(res.text);
+    mockPerson.id = body.id;
     expect(res.status).toBe(201);
-    expect(res.data).toEqual(mockPerson);
+    expect(body).toEqual(mockPerson);
   });
 
   test('GET by /person/{personId}', async () => {
-    const res = await axios(`http://localhost:4000/person/${mockPerson.id}`);
+    const res = await request.get(`person/${mockPerson.id}`);
+    const body = JSON.parse(res.text);
+
     expect(res.status).toBe(200);
-    expect(res.data).toEqual(mockPerson);
+    expect(body).toEqual(mockPerson);
   });
 
   test('PUT by /person/{personId}', async () => {
-    const res = await axios(`http://localhost:4000/person/${mockPerson.id}`, {
-      method: 'PUT',
-      data: { name: 'test', age: mockPerson.age, hobbies: mockPerson.hobbies },
-    });
+    const res = await request
+      .put(`person/${mockPerson.id}`)
+      .send({ name: 'test', age: mockPerson.age, hobbies: mockPerson.hobbies });
+    const body = JSON.parse(res.text);
     expect(res.status).toBe(200);
-    expect(res.data).toEqual({ ...mockPerson, name: 'test' });
+    expect(body).toEqual({ ...mockPerson, name: 'test' });
   });
 
   test('DELETE by /person/{personId}', async () => {
-    const res = await axios(`http://localhost:4000/person/${mockPerson.id}`, {
-      method: 'DELETE',
-    });
+    const res = await request.delete(`person/${mockPerson.id}`);
     expect(res.status).toBe(204);
-    expect(res.data).toBeFalsy();
+    expect(res.text).toBeFalsy();
   });
 
   test('GET by /person/{personId} where {personId} - removed object', async () => {
-    try {
-      await axios(`http://localhost:4000/person/${mockPerson.id}`);
-    } catch (err) {
-      expect(err.response.status).toBe(404);
-      expect(err.response.data).toBe(`Person with id ${mockPerson.id} not found`);
-    }
+    const res = await request.get(`person/${mockPerson.id}`);
+    expect(res.status).toBe(404);
+    expect(res.text).toBe(`Person with id ${mockPerson.id} not found`);
   });
 });
